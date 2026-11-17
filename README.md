@@ -9,6 +9,7 @@ arrival-capacity limit in **Total War Rome II** with **Divide et Impera**.
 - All battle-type values are eligible in supported single-player campaigns.
 - Supports battles with AI main forces when the player joins as reinforcements.
   AI-only pending battles are also eligible.
+- Replay support from the main menu, including a fresh game launch.
 - Automatic DLL loading from the pack.
 
 ## Requirements
@@ -24,12 +25,12 @@ requirements.
 ## Install
 
 1. Close the game.
-2. Copy `rdp_reinforcement_cap_v01_singlepack_all_battles01.pack` into the game's
+2. Copy `rdp_reinforcement_cap_v01_replay_frontend_test01.pack` into the game's
    `data` folder and enable it in your mod manager.
-3. Set its load priority above DEI so its campaign scripts take precedence.
+3. Set its load priority above DEI so its campaign and frontend scripts take precedence.
 
 The pack automatically creates `rdp_rrc_sp01_63d42188045383cf.dll` in the game
-folder when a campaign loads. Choose one mod when using this pack or an initial
+folder when the frontend or a campaign loads. Choose one mod when using this pack or an initial
 deployment mod that patches the same arrival-capacity call.
 
 ## Remove
@@ -39,8 +40,8 @@ Close the game and disable or remove the pack. You may also remove
 
 ## Source and development
 
-Native C and campaign Lua sources are in `src/native/` and `src/lua/`.
-Building the pack requires your own matching DEI campaign scripts.
+Native C, campaign Lua and replay frontend Lua sources are in `src/native/` and `src/lua/`.
+Building the pack requires your own matching DEI campaign scripts and `frontend_scripted.lua`.
 
 - [Build and test](docs/build.md)
 - [Patch implementation](docs/patch-notes.md)

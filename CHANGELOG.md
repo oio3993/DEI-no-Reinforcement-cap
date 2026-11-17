@@ -8,6 +8,13 @@
 - Add reproducible DLL and pack build tools, tests and GitHub Actions.
 - Document supported campaigns, engine requirements and the capacity patch.
 
+## v01 ReplayFrontendTest01
+
+- Add replay loading directly from the main menu, including a fresh game launch.
+- Reuse the existing DLL for replay-browser entry, Watch and Fight.
+- Handle frontend return and campaign handoff with scoped Lua callbacks.
+- Add frontend diagnostics, lifecycle tests and matching DEI frontend build input.
+
 ## v01 AllBattles01
 
 - Allow all battle-type values in supported single-player campaigns.

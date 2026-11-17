@@ -30,6 +30,16 @@ Eligibility depends on the single-player campaign callbacks and the presence of
 both main sides. Standalone custom and historical battles use separate entry
 points from this campaign integration.
 
+## Replays
+
+The single-player replay browser requests the same arrival-capacity patch when
+opened from the main menu. Watch and Fight repeat the request, including after a
+fresh game launch. Use recordings made with the corresponding mod settings.
+
+Frontend callbacks handle replay entry, menu return and campaign handoff. They
+share the native patch state with campaign callbacks, which reset and install
+the patch before a pending campaign battle.
+
 Supporting forces follow the game's reinforcement arrival process. The native
 patch bypasses one arrival-capacity predicate call. Other arrival conditions,
 batch processing, battlefield constraints and practical performance limits
@@ -47,12 +57,13 @@ main_rome        prologue_01      prologue_02
 
 Other campaign folders require their own integration. The pack uses the recorded
 DEI campaign scripts. Source builds check their hashes as described in the
-[build guide](build.md#supply-local-campaign-inputs-and-build-the-pack).
+[build guide](build.md#supply-local-dei-inputs-and-build-the-pack).
 
 ## Mod conflicts
 
-This pack's campaign `scripting.lua` entries must take priority over DEI's entries.
-Another mod replacing the same campaign scripts needs a combined integration.
+This pack's campaign `scripting.lua` and `lua_scripts/frontend_scripted.lua`
+entries must take priority over DEI's entries. Another mod replacing those same
+scripts needs a combined integration.
 Mods patching the same engine call can also conflict.
 
 Initial deployment mods can include this same capacity bypass. Choose one active
@@ -67,7 +78,11 @@ implementation when both mods patch RVA `0x2F65D2`.
   loading. Close the game and check that specific mod file if loading fails.
 - Security software and application-control policies can block DLL creation or
   loading. The game may continue running while the mod has no effect.
-- The current version handles loader failures silently.
+
+Frontend event and loading diagnostics are written to
+`rdp_rrc_replay_frontend_test01.log` in the game working directory.
+`native_call_returned` records a completed Lua invocation. Installation also
+depends on the native guards and memory update operations.
 
 When reporting an issue, include the campaign, battle situation, engine version
 and other active mods.

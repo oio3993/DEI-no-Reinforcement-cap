@@ -11,6 +11,7 @@ STEPS = (
     'tools/build_pack.py --payload-only',
     'tests/test_loader.py',
     'tests/test_campaign.py',
+    'tests/test_frontend.py',
     'tests/test_build_tools.py',
 )
 
@@ -28,7 +29,7 @@ def main():
             raise SystemExit(result.returncode)
     reports = {name:json.loads((ROOT/'build/reports'/name).read_text()) for name in (
         'native_build.json','native_validation.json','loader_tests.json',
-        'campaign_tests.json','build_tools_tests.json')}
+        'campaign_tests.json','frontend_tests.json','build_tools_tests.json')}
     require(reports['native_build.json']['native_compiled'] is True, 'CI must compile from C.')
     require(reports['native_validation.json']['linked_operands_checked'] is True,
             'CI must perform full linked-object verification.')
@@ -43,6 +44,7 @@ def main():
         linked_operand_checks=reports['native_validation.json']['linked_operand_checks'],
         loader_tests=reports['loader_tests.json']['test_count'],
         campaign_tests=reports['campaign_tests.json']['test_count'],
+        frontend_tests=reports['frontend_tests.json']['test_count'],
         packaging_tests=reports['build_tools_tests.json']['test_count'],
         game_inputs_used=False, release_pack_verified=False,
         game_executed=False, mod_dll_executed=False)

@@ -1,4 +1,4 @@
-"""Paths and fingerprints for the Reinforcement Cap AllBattles01 release."""
+"""Paths and fingerprints for the Reinforcement Cap ReplayFrontendTest01 release."""
 from pathlib import Path
 import hashlib
 import json
@@ -14,13 +14,21 @@ GENERATED = BUILD / 'generated'
 DIST = ROOT / 'dist'
 DLL = BUILD / 'rdp_reinforcement_cap_v01.dll'
 PAYLOAD = GENERATED / 'rdp_reinforcement_cap_v01_payload.lua'
-PACK_NAME = 'rdp_reinforcement_cap_v01_singlepack_all_battles01.pack'
+PACK_NAME = 'rdp_reinforcement_cap_v01_replay_frontend_test01.pack'
 DLL_SHA = '63d42188045383cfa615f2165662902be92049dee70b0712176076456c41fcd2'
 DLL_SIZE = 8142
-PACK_SHA = 'f0a24b9ee8cc11ac256fde0926ce7415caf4fc8b815fdc65aa31e7b6a1cc8f7a'
+PACK_SHA = 'aac808714916ceefd51fae1ca1590fc4f6c570a804defeaeabd9d2055a009214'
 BOOTSTRAP = b'\n-- Reinforcement capacity runtime\nrequire "lua_scripts.rdp_reinforcement_cap_v01_campaign";\n'
+FRONTEND_MEMBER = 'lua_scripts\\frontend_scripted.lua'
+FRONTEND_SHA = '22dd7959d114509415233da533e28ea42770512ac62ab26522c9fcc909360b83'
+FRONTEND_BOOTSTRAP = (ROOT/'integration/frontend_bootstrap.lua').read_bytes()
+RUNTIME_MODULES = ('rdp_reinforcement_cap_v01_campaign.lua',
+                   'rdp_reinforcement_cap_v01_loader.lua',
+                   'rdp_rrc_replay_frontend_test01.lua')
 SOURCE_SHA = {
-    'src/native/patch.c': '40f08ef18ea755dd35df4c9441baa8230022d24ed06842d75ba959e6f1ff4a6d',
+    'integration/frontend_bootstrap.lua': '7f5ecfc4e413dcdfe59ec8e48b43204be3a30bccf8fc68b23143425e1b0408e2',
+    'src/lua/rdp_rrc_replay_frontend_test01.lua': '0afcc00afd19f68b9a09085ee6773769cd890c1cd10e77e334873757f1ecc40d',
+    'src/native/patch.c': 'd0227a2ed1fd4502c7bfcb4863988f8e72c09ffe57aab2ca398dd10a313ce658',
     'src/native/patch_bytes.h': 'd711ee1ba999ac51238056961fb26746891ccd788af9ed978de0fded72ede1fd',
     'src/native/patch.def': 'd8462fef3a6e44a317f6389cff830e3e2a441c80c0ecbb04c4fc3aaedf2a5b3a',
     'src/lua/rdp_reinforcement_cap_v01_campaign.lua': '143b8dc3506380b475f10754f927e0eac4715990b2ba4021cac56b713f3ce960',

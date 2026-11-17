@@ -10,7 +10,7 @@ produce i386 ELF objects, the Python ELF-to-COFF converter, and GNU ld with
 - GCC with `-m32` support and GNU ld with `i386pe` support.
 - A Lua 5.4 shared library for tests. Linux defaults to `liblua5.4.so.0`; on
   Windows, set `RDP_LUA_LIBRARY` to a Lua 5.4 DLL matching Python's architecture.
-- Matching local DEI campaign scripts for building the final pack.
+- Matching local DEI campaign scripts and `frontend_scripted.lua` for the final pack.
 
 Tests use a standalone Lua 5.4 host with mocked native exports. The original game
 engine DLL is not a build dependency.
@@ -68,17 +68,18 @@ the guest serial log `windows_gnu_serial.log`.
 python3 tools/build_pack.py --payload-only
 python3 tests/test_loader.py
 python3 tests/test_campaign.py
+python3 tests/test_frontend.py
 python3 tests/test_build_tools.py
 ```
 
-The packaging tests use synthetic campaign/pack fixtures and require no DEI
+The packaging tests use synthetic campaign/frontend/pack fixtures and require no DEI
 originals or released pack. For the Lua tests on Windows, set the shared library:
 
 ```powershell
 $env:RDP_LUA_LIBRARY = 'C:\path\to\lua54.dll'
 ```
 
-## Supply local campaign inputs and build the pack
+## Supply local DEI inputs and build the pack
 
 Extract the matching original DEI scripts with a pack editor, preserving this
 layout. Pass the **campaigns directory itself** as `--campaign-dir`:
@@ -97,23 +98,24 @@ layout. Pass the **campaigns directory itself** as `--campaign-dir`:
 ```
 
 ```sh
-python3 tools/build_pack.py --campaign-dir /path/to/local-dei/campaigns
+python3 tools/build_pack.py --campaign-dir /path/to/local-dei/campaigns --frontend-script /path/to/local-dei/lua_scripts/frontend_scripted.lua
 python3 tools/verify_release.py
 ```
 
-Input files are read only. The builder checks all nine hashes in
-`tools/project.py`, rejects an existing bootstrap, and appends
-`integration/dei_bootstrap.lua`. Keep local inputs outside `dist/`. Full DEI
-scripts are not included in the repository; changed inputs require a compatibility
+Extract `lua_scripts/frontend_scripted.lua` from the matching DEI pack as well.
+Input files are read only. The builder checks all ten hashes in
+`tools/project.py`, rejects existing bootstrap calls, and appends the campaign
+and frontend snippets from `integration/`. Keep local inputs outside `dist/`. Full DEI
+scripts are supplied locally; changed inputs require a compatibility
 review.
 
 The resulting pack must have SHA-256:
 
 ```text
-f0a24b9ee8cc11ac256fde0926ce7415caf4fc8b815fdc65aa31e7b6a1cc8f7a
+aac808714916ceefd51fae1ca1590fc4f6c570a804defeaeabd9d2055a009214
 ```
 
-Release verification checks all 12 entries, original script prefixes, bootstrap
+Release verification checks all 14 entries, original script prefixes, bootstrap
 insertion, runtime source identity, Lua syntax, the interpreted payload and native
 linked objects. It writes `dist/SHA256SUMS.txt` after success.
 
@@ -122,7 +124,7 @@ linked objects. It writes `dist/SHA256SUMS.txt` after success.
 For a pack-only rebuild without a GNU compiler:
 
 ```sh
-python3 tools/build_native.py --reference-pack /path/to/rdp_reinforcement_cap_v01_singlepack_all_battles01.pack
+python3 tools/build_native.py --reference-pack /path/to/rdp_reinforcement_cap_v01_replay_frontend_test01.pack
 python3 tools/verify_native.py --pe-only
 ```
 
@@ -140,7 +142,7 @@ their SHA-256 hashes before extraction. The workflow pins GitHub actions to
 commit hashes and uses read-only repository permissions.
 
 The pipeline compiles and verifies the DLL, generates the payload, and runs
-loader, campaign and packaging tests. On a Linux host with the required GNU tools
+loader, campaign, replay frontend and packaging tests. On a Linux host with the required GNU tools
 and Lua library already installed, run it directly:
 
 ```sh
@@ -173,7 +175,7 @@ build/
   generated/rdp_reinforcement_cap_v01_payload.lua
   reports/*.json
 dist/
-  rdp_reinforcement_cap_v01_singlepack_all_battles01.pack
+  rdp_reinforcement_cap_v01_replay_frontend_test01.pack
   SHA256SUMS.txt
 ```
 

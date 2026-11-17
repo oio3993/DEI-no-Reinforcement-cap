@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 import sys
 from project import (ROOT, DLL, PAYLOAD, DIST, PACK_NAME, PACK_SHA, DLL_SHA, CAMPAIGN_SHA,
-                     BOOTSTRAP, check_sources, check_dll, decode_payload, make_payload,
+                     BOOTSTRAP, FRONTEND_MEMBER, FRONTEND_SHA, FRONTEND_BOOTSTRAP, RUNTIME_MODULES,
+                     check_sources, check_dll, decode_payload, make_payload,
                      sha, require, write_report)
 from pack_io import read_pack
 from verify_native import verify as verify_native
@@ -16,15 +17,21 @@ def verify_pack(raw, native):
     entries = read_pack(raw)
     campaign_names = {'campaigns\\'+name+'\\scripting.lua' for name in CAMPAIGN_SHA}
     runtime_names = {'lua_scripts\\'+name for name in
-                     ('rdp_reinforcement_cap_v01_campaign.lua','rdp_reinforcement_cap_v01_loader.lua','rdp_reinforcement_cap_v01_payload.lua')}
-    require(set(entries) == campaign_names | runtime_names, 'Unexpected pack entries.')
+                     (*RUNTIME_MODULES, 'rdp_reinforcement_cap_v01_payload.lua')}
+    require(set(entries) == campaign_names | runtime_names | {FRONTEND_MEMBER}, 'Unexpected pack entries.')
     for name, digest in CAMPAIGN_SHA.items():
         content = entries['campaigns\\'+name+'\\scripting.lua']
         require(content.endswith(BOOTSTRAP), 'Missing bootstrap: '+name)
         original = content[:-len(BOOTSTRAP)]
         require(sha(original) == digest, 'DEI prefix differs: '+name)
         require(b'lua_scripts.rdp_reinforcement_cap_v01_campaign' not in original, 'Duplicate bootstrap: '+name)
-    for name in ('rdp_reinforcement_cap_v01_campaign.lua','rdp_reinforcement_cap_v01_loader.lua'):
+    frontend = entries[FRONTEND_MEMBER]
+    require(frontend.endswith(FRONTEND_BOOTSTRAP), 'Missing frontend bootstrap.')
+    frontend_original = frontend[:-len(FRONTEND_BOOTSTRAP)]
+    require(sha(frontend_original) == FRONTEND_SHA, 'Frontend prefix differs.')
+    require(b'lua_scripts.rdp_rrc_replay_frontend_test01' not in frontend_original,
+            'Duplicate frontend bootstrap.')
+    for name in RUNTIME_MODULES:
         require(entries['lua_scripts\\'+name] == (ROOT/'src/lua'/name).read_bytes(), 'Runtime source differs: '+name)
     payload = entries['lua_scripts\\rdp_reinforcement_cap_v01_payload.lua']
     require(payload == make_payload(native), 'Packed payload differs from the DLL.')
@@ -56,7 +63,7 @@ def main():
                   campaign_count=len(CAMPAIGN_SHA), native_sha256=DLL_SHA, native_size=len(native),
                   native_linked_checks_performed=native_report['linked_operands_checked'],
                   generated_and_packed_payload_identical=True, interpreted_payload_roundtrip=True,
-                  original_prefixes_and_sources_identical=True, exact_baseline_pack=True,
+                  original_prefixes_and_sources_identical=True, exact_release_pack=True, frontend_source_verified=True,
                   syntax_checked=len(entries), host_runtime=HOST_RUNTIME,
                   game_lua_5_1_executed=False, game_executed=False, mod_dll_executed=False)
     report['checksum_written'] = args.pack.resolve().parent == DIST.resolve()

@@ -67,6 +67,28 @@ The on-disk runtime name is `rdp_rrc_sp01_63d42188045383cf.dll`. The build outpu
 is `rdp_reinforcement_cap_v01.dll`. The mod DLL uses preferred image base
 `0x62000000`.
 
+## Replay frontend lifecycle
+
+`frontend_scripted.lua` receives the matching DEI script followed by
+`integration/frontend_bootstrap.lua`. The protected bootstrap starts
+`rdp_rrc_replay_frontend_test01.lua`, which reuses the loader and native exports.
+
+The frontend prepares the DLL and requests a reset on FrontEnd UI creation. Entry
+to `sp_replays` requests `rrc_install`. Watch and Fight request installation again.
+Replay entry retains the request while the frontend UI is destroyed. Menu return,
+navigation away from the replay browser and recognized multiplayer screens
+request a reset. Campaign UI creation releases frontend bookkeeping, and campaign
+callbacks manage subsequent pending battles.
+
+Callbacks retain a short-lived replay context to accept a queued Watch/Fight
+event during the transition. Battle or campaign UI creation clears that context.
+Re-registration retires the earlier callback closures. The diagnostic log records
+up to 256 entries per module lifetime.
+
+Campaign and frontend callbacks share process-wide native state. The native DLL
+is the same 8,142-byte binary used by AllBattles01, with SHA-256
+`63d42188045383cfa615f2165662902be92049dee70b0712176076456c41fcd2`.
+
 ## Native guards and restoration
 
 Installation verifies the engine file SHA-256, a 15-byte arrival signature at

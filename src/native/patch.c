@@ -83,8 +83,8 @@ static int match_at(u32 address,const u8* expected,u32 size) {
 static void copy_to(u32 address,const u8* data,u32 size) {
     volatile u8* target=(volatile u8*)address;u32 i;for(i=0;i<size;i++)target[i]=data[i];
 }
-/* One guarded five-byte callsite. Run only from campaign callbacks, before
- * battle construction or after completion. Roll back on cache/read/protection
+/* One guarded five-byte callsite. Used by campaign and frontend state transitions.
+ * Roll back on cache/read/protection
  * failure. Return -1 if rollback or original permissions cannot be confirmed.
  */
 static int change_reinforcement_site(int enable) {

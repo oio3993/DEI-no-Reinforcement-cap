@@ -37,7 +37,7 @@ def write_overlay(path):
         entries[name] = (mode, data)
 
     inputs = list((ROOT/'src').rglob('*')) + list((ROOT/'tools').glob('*.py'))
-    inputs.append(ROOT/'integration/dei_bootstrap.lua')
+    inputs.extend((ROOT/'integration').glob('*.lua'))
     for item in inputs:
         if item.is_file():
             put('work/repo/'+item.relative_to(ROOT).as_posix(), item.read_bytes())
