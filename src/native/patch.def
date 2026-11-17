@@ -1,0 +1,4 @@
+LIBRARY rdp_reinforcement_cap_v01
+EXPORTS
+    rrc_install
+    rrc_disable
